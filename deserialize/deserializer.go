@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const GROTH_16_PROTOCOL_ID = 1
+const GROTH_16_PROTOCOL_ID = uint32(1)
 
 type NotGroth16 struct {
 	Err error
@@ -52,6 +52,14 @@ func ReadZkey(zkeyPath string) (Zkey, error) {
 
 	// Create a new buffered reader
 	reader := bufio.NewReader(file)
+
+	var buffer = make([]byte, 4)
+
+	_, err = reader.Read(buffer)
+
+	if err != nil {
+		return Zkey{}, err
+	}
 
 	header, err := readHeader(reader)
 
