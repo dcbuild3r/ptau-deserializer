@@ -13,16 +13,21 @@ import (
 // (https://github.com/iden3/snarkjs/blob/fb144555d8ce4779ad79e707f269771c672a8fb7/src/zkey_utils.js#L20-L45)
 // Format
 // ======
+// 4 bytes, zket
+// 4 bytes, version
+// 4 bytes, number of sections
+// 4 bytes, section number
+// 8 bytes, section size
 // Header(1)
-//      Prover Type 1 Groth
+// 4 bytes, Prover Type 1 Groth
 // HeaderGroth(2)
-//      n8q
-//      q
-//      n8r
-//      r
-//      NVars
-//      NPub
-//      DomainSize  (multiple of 2
+// 4 bytes, n8q
+// n8q bytes, q
+// 4 bytes, n8r
+// n8r bytes, r
+// 4 bytes, NVars
+// 4 bytes, NPub
+// 4 bytes, DomainSize  (multiple of 2)
 //      alpha1
 //      beta1
 //      delta1
@@ -74,13 +79,20 @@ func ReadZkey(zkeyPath string) (Zkey, error) {
 	// Create a new buffered reader
 	reader := bufio.NewReader(file)
 
-	var buffer = make([]byte, 4)
+	// zkey
+	_, err = readULE32(reader)
 
-	_, err = reader.Read(buffer)
+	// version
+	_, err = readULE32(reader)
 
-	if err != nil {
-		return Zkey{}, err
-	}
+	// number of sections
+	_, err = readULE32(reader)
+
+	// section number
+	_, err = readULE32(reader)
+
+	// section size
+	_, err = readBigInt(reader, 8)
 
 	header, err := readHeader(reader)
 
