@@ -9,6 +9,27 @@ import (
 	"os"
 )
 
+// Taken from the iden3/snarkjs repo, zkey_utils.js
+// (https://github.com/iden3/snarkjs/blob/fb144555d8ce4779ad79e707f269771c672a8fb7/src/zkey_utils.js#L20-L45)
+// Format
+// ======
+// Header(1)
+//      Prover Type 1 Groth
+// HeaderGroth(2)
+//      n8q
+//      q
+//      n8r
+//      r
+//      NVars
+//      NPub
+//      DomainSize  (multiple of 2
+//      alpha1
+//      beta1
+//      delta1
+//      beta2
+//      gamma2
+//      delta2
+
 const GROTH_16_PROTOCOL_ID = uint32(1)
 
 type NotGroth16 struct {
@@ -38,7 +59,7 @@ type HeaderGroth struct {
 	nVars      uint32
 	nPublic    uint32
 	domainSize uint32
-	power      float64
+	power      uint32
 }
 
 func ReadZkey(zkeyPath string) (Zkey, error) {
@@ -145,7 +166,9 @@ func readHeaderGroth16(reader *bufio.Reader) (HeaderGroth, error) {
 
 	power := math.Log2(float64(domainSize))
 
-	header = HeaderGroth{n8q: n8q, q: q, n8r: n8r, r: r, nVars: nVars, nPublic: nPublic, domainSize: domainSize, power: power}
+	power_int := uint32(math.Ceil(power))
+
+	header = HeaderGroth{n8q: n8q, q: q, n8r: n8r, r: r, nVars: nVars, nPublic: nPublic, domainSize: domainSize, power: power_int}
 
 	return header, nil
 }
