@@ -67,7 +67,7 @@ const BN254_FIELD_ELEMENT_SIZE = 32
 
 // G1 and G2 are both arrays of two big.Ints (field elements)
 type G1 [2]big.Int
-type G2 [2]big.Int
+type G2 [4]big.Int
 
 type PtauHeader struct {
 	n8    uint32
@@ -147,7 +147,8 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 
 	var PtauPubKey PtauPubKey
 
-	PtauPubKey.TauG1, err = readG1Array(reader)
+	twoToPower := uint32(1 << header.power)
+	PtauPubKey.TauG1, err = readG1Array(reader, twoToPower*2-1)
 
 	if err != nil {
 		return Ptau{}, err
@@ -156,7 +157,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// TauG2 (3)
 	seekToUniqueSection(reader, sections, 3)
 
-	PtauPubKey.TauG2, err = readG2Array(reader)
+	PtauPubKey.TauG2, err = readG2Array(reader, twoToPower)
 
 	if err != nil {
 		return Ptau{}, err
@@ -165,7 +166,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// AlphaTauG1 (4)
 	seekToUniqueSection(reader, sections, 4)
 
-	PtauPubKey.AlphaTauG1, err = readG1Array(reader)
+	PtauPubKey.AlphaTauG1, err = readG1Array(reader, twoToPower)
 
 	if err != nil {
 		return Ptau{}, err
@@ -174,7 +175,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// BetaTauG1 (5)
 	seekToUniqueSection(reader, sections, 5)
 
-	PtauPubKey.BetaTauG1, err = readG1Array(reader)
+	PtauPubKey.BetaTauG1, err = readG1Array(reader, twoToPower)
 
 	if err != nil {
 		return Ptau{}, err
@@ -191,6 +192,13 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 
 	return Ptau{Header: header, PTauPubKey: PtauPubKey}, nil
 }
+
+// looks good ser
+// nice!
+
+// thanks! btw now I have to just figure out how to serialize it into .ph1 and then just write
+
+// don't think so - can call the function directly
 
 func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 	var header PtauHeader
@@ -222,36 +230,34 @@ func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 	return header, nil
 }
 
-func readG1Array(reader io.ReadSeeker) ([]G1, error) {
-	G1_s, err := readG1(reader)
+func readG1Array(reader io.ReadSeeker, numPoints uint32) ([]G1, error) {
+	g1s := make([]G1, numPoints)
+	for i := uint32(0); i < numPoints; i++ {
+		g1, err := readG1(reader)
 
-	if err != nil {
-		return []G1{}, err
+		if err != nil {
+			return []G1{}, err
+		}
+
+		g1s[i] = g1
 	}
-
-	G1_sx, err := readG1(reader)
-
-	if err != nil {
-		return []G1{}, err
-	}
-
-	return []G1{G1_s, G1_sx}, nil
+	return g1s, nil
 }
 
-func readG2Array(reader io.ReadSeeker) ([]G2, error) {
-	G2_s, err := readG2(reader)
+func readG2Array(reader io.ReadSeeker, numPoints uint32) ([]G2, error) {
+	g2s := make([]G2, numPoints)
 
-	if err != nil {
-		return []G2{}, err
+	for i := uint32(0); i < numPoints; i++ {
+		g2, err := readG2(reader)
+
+		if err != nil {
+			return []G2{}, err
+		}
+
+		g2s[i] = g2
 	}
 
-	G2_sx, err := readG2(reader)
-
-	if err != nil {
-		return []G2{}, err
-	}
-
-	return []G2{G2_s, G2_sx}, nil
+	return g2s, nil
 }
 
 func readTauG2(reader io.ReadSeeker) ([]G2, error) {
@@ -303,13 +309,29 @@ func readG2(reader io.ReadSeeker) (G2, error) {
 
 	g2[0] = x0
 
-	y, err := readBigInt(reader, BN254_FIELD_ELEMENT_SIZE)
+	x1, err := readBigInt(reader, BN254_FIELD_ELEMENT_SIZE)
 
 	if err != nil {
 		return G2{}, err
 	}
 
-	g2[1] = y
+	g2[1] = x1
+
+	y0, err := readBigInt(reader, BN254_FIELD_ELEMENT_SIZE)
+
+	if err != nil {
+		return G2{}, err
+	}
+
+	g2[2] = y0
+
+	y1, err := readBigInt(reader, BN254_FIELD_ELEMENT_SIZE)
+
+	if err != nil {
+		return G2{}, err
+	}
+
+	g2[3] = y1
 
 	return g2, nil
 }
