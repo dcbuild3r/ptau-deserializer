@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/consensys/gnark/backend/groth16/bn254/mpcsetup"
 	"github.com/stretchr/testify/require"
 )
 
@@ -87,6 +88,8 @@ func TestDeserializerPreparePhase2Ptau(t *testing.T) {
 	if err != nil {
 		assert.NoError(err)
 	}
+
+	mpcsetup.InitPhase2(/* put some )
 
 	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
 }
