@@ -26,7 +26,21 @@ import (
 //      gamma2
 //      delta2
 
-func TestDeserializer(t *testing.T) {
+func TestDeserializerPtau(t *testing.T) {
+	input_path := "powersOfTau28_hez_final_08.ptau"
+
+	assert := require.New(t)
+
+	ptau, err := ReadPtau(input_path)
+
+	if err != nil {
+		assert.NoError(err)
+	}
+
+	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
+}
+
+func TestDeserializerZkey(t *testing.T) {
 	input_path := "semaphore_16.zkey"
 
 	assert := require.New(t)
@@ -37,10 +51,10 @@ func TestDeserializer(t *testing.T) {
 		assert.NoError(err)
 	}
 
-	fmt.Printf("ProtocolID for Groth16: %v \n", zkey.Header.ProtocolID)
+	fmt.Printf("ProtocolID for Groth16: %v \n", zkey.ZkeyHeader.ProtocolID)
 
 	// protocolID should be 1 (Groth16)
-	assert.Equal(GROTH_16_PROTOCOL_ID, zkey.Header.ProtocolID)
+	assert.Equal(GROTH_16_PROTOCOL_ID, zkey.ZkeyHeader.ProtocolID)
 
 	fmt.Printf("n8q is: %v \n", zkey.protocolHeader.n8q)
 
