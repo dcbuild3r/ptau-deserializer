@@ -1,4 +1,4 @@
-# zkey-deserializer
+# ptau-deserializer
 
 .zkey and .ptau deserializer for gnark groth16 bn254 trusted setup
 
