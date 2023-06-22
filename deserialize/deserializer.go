@@ -108,7 +108,9 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	_, err = readULE32(reader)
 
 	// number of sections
-	numSections, err := readULE32(reader)
+	_, err = readULE32(reader)
+
+	numSections := uint32(7)
 	fmt.Printf("num sections: %v \n", numSections)
 
 	// in practice, all sections have only one segment, but who knows...
@@ -147,7 +149,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 
 	var PtauPubKey PtauPubKey
 
-	PtauPubKey.TauG1, err = readTauG1(reader)
+	PtauPubKey.TauG1, err = readG1Array(reader)
 
 	if err != nil {
 		return Ptau{}, err
@@ -156,7 +158,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// TauG2 (3)
 	seekToUniqueSection(reader, sections, 3)
 
-	PtauPubKey.TauG2, err = readTauG2(reader)
+	PtauPubKey.TauG2, err = readG2Array(reader)
 
 	if err != nil {
 		return Ptau{}, err
@@ -165,7 +167,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// AlphaTauG1 (4)
 	seekToUniqueSection(reader, sections, 4)
 
-	PtauPubKey.AlphaTauG1, err = readAlphaTauG1(reader)
+	PtauPubKey.AlphaTauG1, err = readG1Array(reader)
 
 	if err != nil {
 		return Ptau{}, err
@@ -174,7 +176,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// BetaTauG1 (5)
 	seekToUniqueSection(reader, sections, 5)
 
-	PtauPubKey.BetaTauG1, err = readBetaTauG1(reader)
+	PtauPubKey.BetaTauG1, err = readG1Array(reader)
 
 	if err != nil {
 		return Ptau{}, err
@@ -183,7 +185,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 	// BetaG2 (6)
 	seekToUniqueSection(reader, sections, 6)
 
-	PtauPubKey.BetaG2, err = readBetaG2(reader)
+	PtauPubKey.BetaG2, err = readG2(reader)
 
 	if err != nil {
 		return Ptau{}, err
@@ -222,20 +224,36 @@ func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 	return header, nil
 }
 
-func readTauG1(reader io.ReadSeeker) ([]G1, error) {
-	tauG1_s, err := readG1(reader)
+func readG1Array(reader io.ReadSeeker) ([]G1, error) {
+	G1_s, err := readG1(reader)
 
 	if err != nil {
 		return []G1{}, err
 	}
 
-	tauG1_sx, err := readG1(reader)
+	G1_sx, err := readG1(reader)
 
 	if err != nil {
 		return []G1{}, err
 	}
 
-	return []G1{tauG1_s, tauG1_sx}, nil
+	return []G1{G1_s, G1_sx}, nil
+}
+
+func readG2Array(reader io.ReadSeeker) ([]G2, error) {
+	G2_s, err := readG2(reader)
+
+	if err != nil {
+		return []G2{}, err
+	}
+
+	G2_sx, err := readG2(reader)
+
+	if err != nil {
+		return []G2{}, err
+	}
+
+	return []G2{G2_s, G2_sx}, nil
 }
 
 func readTauG2(reader io.ReadSeeker) ([]G2, error) {
@@ -252,49 +270,6 @@ func readTauG2(reader io.ReadSeeker) ([]G2, error) {
 	}
 
 	return []G2{tauG2_s, tauG2_sx}, nil
-}
-
-func readAlphaTauG1(reader io.ReadSeeker) ([]G1, error) {
-	alphaTauG1_s, err := readG1(reader)
-
-	if err != nil {
-		return []G1{}, err
-	}
-
-	alphaTauG1_sx, err := readG1(reader)
-
-	if err != nil {
-		return []G1{}, err
-	}
-
-	return []G1{alphaTauG1_s, alphaTauG1_sx}, nil
-}
-
-func readBetaTauG1(reader io.ReadSeeker) ([]G1, error) {
-	betaTauG1_s, err := readG1(reader)
-
-	if err != nil {
-		return []G1{}, err
-	}
-
-	betaTauG1_sx, err := readG1(reader)
-
-	if err != nil {
-		return []G1{}, err
-	}
-
-	return []G1{betaTauG1_s, betaTauG1_sx}, nil
-}
-
-func readBetaG2(reader io.ReadSeeker) (G2, error) {
-	betaG2, err := readG2(reader)
-
-	if err != nil {
-		return G2{}, err
-	}
-
-	return betaG2, nil
-
 }
 
 func readG1(reader io.ReadSeeker) (G1, error) {
