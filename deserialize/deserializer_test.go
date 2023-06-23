@@ -1,9 +1,13 @@
 package deserializer
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"testing"
 
+	"github.com/bnb-chain/zkbnb-setup/phase1"
+	"github.com/bnb-chain/zkbnb-setup/phase2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -63,11 +67,16 @@ contributions(7) - Ignore contributions, users can verify using snarkjs
 */
 
 func TestDeserializerPhase1(t *testing.T) {
-	input_path := "08.ptau"
-
 	assert := require.New(t)
 
+	input_path := "08.ptau"
+
 	ptau, err := ReadPtau(input_path)
+
+	if err != nil {
+		assert.NoError(err)
+	}
+
 	phase1, err := convertPtauToSrs(ptau)
 
 	fmt.Printf("TauG1: %v \n", phase1.Parameters.G1.Tau)
@@ -84,9 +93,9 @@ func TestDeserializerPhase1(t *testing.T) {
 }
 
 func TestDeserializerPreparePhase2Ptau(t *testing.T) {
-	input_path := "08.ptau"
-
 	assert := require.New(t)
+
+	input_path := "08.ptau"
 
 	ptau, err := ReadPtau(input_path)
 
@@ -97,6 +106,67 @@ func TestDeserializerPreparePhase2Ptau(t *testing.T) {
 	//mpcsetup.InitPhase2()
 
 	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
+}
+
+func TestDeserializePh1(t *testing.T) {
+	assert := require.New(t)
+
+	input_path_ptau := "08.ptau"
+
+	ptau, err := ReadPtau(input_path_ptau)
+
+	if err != nil {
+		assert.NoError(err)
+	}
+
+	ph1, err := convertPtauToSrs(ptau)
+
+	if err != nil {
+		assert.NoError(err)
+	}
+
+	output_path := "08.ph1"
+
+	outputFile, err := os.Create(output_path)
+
+	if err != nil {
+		assert.NoError(err)
+	}
+
+	defer outputFile.Close()
+
+	writer := bufio.NewWriter(outputFile)
+	defer writer.Flush()
+
+	var header phase1.Header
+
+	header.Power = byte(uint8(8))
+
+	// Taken from https://github.com/iden3/snarkjs/#7-prepare-phase-2
+	header.Contributions = uint16(54)
+
+	ph1.WriteTo(outputFile)
+
+	phase1Path := "08.ph1"
+
+	phase1File, err := os.Open(phase1Path)
+	if err != nil {
+		assert.NoError(err)
+	}
+	defer phase1File.Close()
+}
+
+func TestInitializePhase2(t *testing.T) {
+	assert := require.New(t)
+
+	ph1FilePath := "08.ph1"
+	r1csFilePath := "demo_smtb.r1cs"
+	phase2FilePath := "08.ph2"
+
+	if err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath); err != nil {
+		assert.NoError(err)
+	}
+
 }
 
 ///////////////////////////////////////////////////////////////////
