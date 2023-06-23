@@ -65,7 +65,6 @@ contributions(7) - Ignore contributions, users can verify using snarkjs
 // in bytes
 const BN254_FIELD_ELEMENT_SIZE = 32
 
-// G1 and G2 are both arrays of two big.Ints (field elements)
 type G1 [2]big.Int
 type G2 [4]big.Int
 
@@ -192,13 +191,6 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 
 	return Ptau{Header: header, PTauPubKey: PtauPubKey}, nil
 }
-
-// looks good ser
-// nice!
-
-// thanks! btw now I have to just figure out how to serialize it into .ph1 and then just write
-
-// don't think so - can call the function directly
 
 func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 	var header PtauHeader

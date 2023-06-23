@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/consensys/gnark/backend/groth16/bn254/mpcsetup"
 	"github.com/stretchr/testify/require"
 )
 
@@ -69,7 +68,13 @@ func TestDeserializerPhase1(t *testing.T) {
 	assert := require.New(t)
 
 	ptau, err := ReadPtau(input_path)
-	convertPtauToSrs(ptau)
+	phase1, err := convertPtauToSrs(ptau)
+
+	fmt.Printf("TauG1: %v \n", phase1.Parameters.G1.Tau)
+	fmt.Printf("AlphaTauG1: %v \n", phase1.Parameters.G1.AlphaTau)
+	fmt.Printf("BetaTauG1: %v \n", phase1.Parameters.G1.BetaTau)
+	fmt.Printf("TauG2: %v \n", phase1.Parameters.G2.Tau)
+	fmt.Printf("BetaG2: %v \n", phase1.Parameters.G2.Beta)
 
 	if err != nil {
 		assert.NoError(err)
@@ -89,7 +94,7 @@ func TestDeserializerPreparePhase2Ptau(t *testing.T) {
 		assert.NoError(err)
 	}
 
-	mpcsetup.InitPhase2(/* put some )
+	//mpcsetup.InitPhase2()
 
 	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
 }
