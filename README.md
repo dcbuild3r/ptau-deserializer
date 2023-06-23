@@ -1,4 +1,4 @@
-# zkey-deserializer
+# ptau-deserializer
 
 .zkey and .ptau deserializer for gnark groth16 bn254 trusted setup
 
@@ -26,4 +26,10 @@ Same applies for the `.zkey` file:
 
 ```bash
 hexdump -C deserialize/semaphore_16.zkey > deserialize/semaphore_16.zkey.hex
+```
+
+To test, run:
+
+```bash
+cd deserialize && go test -v
 ```
