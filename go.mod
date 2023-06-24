@@ -31,3 +31,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
+
+replace github.com/consensys/gnark => github.com/bnb-chain/gnark v0.7.2-0.20230417083854-81e50b01d1ec
