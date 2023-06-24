@@ -3,11 +3,75 @@ package deserializer
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 
 	curve "github.com/consensys/gnark-crypto/ecc/bn254"
 	fp "github.com/consensys/gnark-crypto/ecc/bn254/fp"
-	"github.com/consensys/gnark/backend/groth16/bn254/mpcsetup"
 )
+
+// Taken from https://github.com/ConsenSys/gnark/blob/b01ec42ceb18e1d316e3b7386e195b929212325e/backend/groth16/bn254/mpcsetup/phase1.go
+type Phase1 struct {
+	Parameters struct {
+		G1 struct {
+			Tau      []curve.G1Affine // {[τ⁰]₁, [τ¹]₁, [τ²]₁, …, [τ²ⁿ⁻²]₁}
+			AlphaTau []curve.G1Affine // {α[τ⁰]₁, α[τ¹]₁, α[τ²]₁, …, α[τⁿ⁻¹]₁}
+			BetaTau  []curve.G1Affine // {β[τ⁰]₁, β[τ¹]₁, β[τ²]₁, …, β[τⁿ⁻¹]₁}
+		}
+		G2 struct {
+			Tau  []curve.G2Affine // {[τ⁰]₂, [τ¹]₂, [τ²]₂, …, [τⁿ⁻¹]₂}
+			Beta curve.G2Affine   // [β]₂
+		}
+	}
+	PublicKeys struct {
+		Tau, Alpha, Beta PublicKey
+	}
+	Hash []byte // sha256 hash
+}
+
+// taken from https://github.com/ConsenSys/gnark/blob/b01ec42ceb18e1d316e3b7386e195b929212325e/backend/groth16/bls12-381/mpcsetup/marshal.go
+// WriteTo implements io.WriterTo
+func (phase1 *Phase1) WriteTo(writer io.Writer) (int64, error) {
+	n, err := phase1.writeTo(writer)
+	if err != nil {
+		return n, err
+	}
+	nBytes, err := writer.Write(phase1.Hash)
+	return int64(nBytes) + n, err
+}
+
+func (phase1 *Phase1) writeTo(writer io.Writer) (int64, error) {
+	toEncode := []interface{}{
+		&phase1.PublicKeys.Tau.SG,
+		&phase1.PublicKeys.Tau.SXG,
+		&phase1.PublicKeys.Tau.XR,
+		&phase1.PublicKeys.Alpha.SG,
+		&phase1.PublicKeys.Alpha.SXG,
+		&phase1.PublicKeys.Alpha.XR,
+		&phase1.PublicKeys.Beta.SG,
+		&phase1.PublicKeys.Beta.SXG,
+		&phase1.PublicKeys.Beta.XR,
+		phase1.Parameters.G1.Tau,
+		phase1.Parameters.G1.AlphaTau,
+		phase1.Parameters.G1.BetaTau,
+		phase1.Parameters.G2.Tau,
+		&phase1.Parameters.G2.Beta,
+	}
+
+	enc := curve.NewEncoder(writer)
+	for _, v := range toEncode {
+		if err := enc.Encode(v); err != nil {
+			return enc.BytesWritten(), err
+		}
+	}
+	return enc.BytesWritten(), nil
+}
+
+// taken from https://github.com/ConsenSys/gnark/blob/b01ec42ceb18e1d316e3b7386e195b929212325e/backend/groth16/bls12-381/mpcsetup/utils.go
+type PublicKey struct {
+	SG  curve.G1Affine
+	SXG curve.G1Affine
+	XR  curve.G2Affine
+}
 
 func bytesToElement(b []byte) fp.Element {
 	var z fp.Element
@@ -24,7 +88,7 @@ func bytesToElement(b []byte) fp.Element {
 	return z
 }
 
-func convertPtauToSrs(ptau Ptau) (phase1 mpcsetup.Phase1, err error) {
+func convertPtauToSrs(ptau Ptau) (phase1 Phase1, err error) {
 	tauG1 := make([]curve.G1Affine, len(ptau.PTauPubKey.TauG1))
 	for i, g1 := range ptau.PTauPubKey.TauG1 {
 		g1Affine := curve.G1Affine{}

@@ -160,7 +160,7 @@ func TestInitializePhase2(t *testing.T) {
 	assert := require.New(t)
 
 	ph1FilePath := "08.ph1"
-	r1csFilePath := "demo_smtb.r1cs"
+	r1csFilePath := "simple.r1cs"
 	phase2FilePath := "08.ph2"
 
 	if err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath); err != nil {

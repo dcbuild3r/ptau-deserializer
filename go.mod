@@ -2,9 +2,7 @@ module example/user/ptau-deserializer
 
 go 1.20
 
-replace github.com/consensys/gnark v0.8.0 => github.com/consensys/gnark v0.7.2-0.20230623025405-a75adf0c9918
-
-require github.com/consensys/gnark v0.8.0
+require github.com/consensys/gnark v0.8.0 // indirect
 
 require (
 	github.com/bnb-chain/zkbnb-setup v1.0.0-ceremony
