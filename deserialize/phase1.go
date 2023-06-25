@@ -18,7 +18,7 @@ type Phase1 struct {
 	betaG2     curve.G2Affine
 }
 
-func ConvertPtauToPhase1(ptau Ptau) (phase1 Phase1, power byte, err error) {
+func ConvertPtauToPhase1(ptau Ptau) (phase1 Phase1, err error) {
 	tauG1 := make([]curve.G1Affine, len(ptau.PTauPubKey.TauG1))
 	for i, g1 := range ptau.PTauPubKey.TauG1 {
 		g1Affine := curve.G1Affine{}
@@ -109,7 +109,7 @@ func ConvertPtauToPhase1(ptau Ptau) (phase1 Phase1, power byte, err error) {
 
 	//fmt.Printf("BetaG2: %v \n", BetaG2)
 
-	return Phase1{tauG1: tauG1, tauG2: tauG2, alphaTauG1: alphaTauG1, betaTauG1: betaTauG1, betaG2: betaG2}, power, nil
+	return Phase1{tauG1: tauG1, tauG2: tauG2, alphaTauG1: alphaTauG1, betaTauG1: betaTauG1, betaG2: betaG2}, nil
 }
 
 func WritePhase1(phase1 Phase1, power byte, outputPath string) error {

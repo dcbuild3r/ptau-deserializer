@@ -63,7 +63,7 @@ contributions(7) - Ignore contributions, users can verify using snarkjs
     ]
 */
 
-func TestDeserializerPhase1(t *testing.T) {
+func TestDeserializePtauConvertPhase1(t *testing.T) {
 	assert := require.New(t)
 
 	input_path := "08.ptau"
@@ -74,7 +74,7 @@ func TestDeserializerPhase1(t *testing.T) {
 		assert.NoError(err)
 	}
 
-	phase1, _, err := ConvertPtauToPhase1(ptau)
+	phase1, err := ConvertPtauToPhase1(ptau)
 
 	if err != nil {
 		assert.NoError(err)
@@ -85,40 +85,9 @@ func TestDeserializerPhase1(t *testing.T) {
 	fmt.Printf("BetaTauG1: %v \n", phase1.betaTauG1)
 	fmt.Printf("TauG2: %v \n", phase1.tauG2)
 	fmt.Printf("BetaG2: %v \n", phase1.betaG2)
-}
-
-func TestDeserializerPreparePhase2Ptau(t *testing.T) {
-	assert := require.New(t)
-
-	input_path := "08.ptau"
-
-	ptau, err := ReadPtau(input_path)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
-	//mpcsetup.InitPhase2()
-
-	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
-}
-
-func TestDeserializePtauConvertPh1(t *testing.T) {
-	assert := require.New(t)
-
-	input_path_ptau := "08.ptau"
-
-	ptau, err := ReadPtau(input_path_ptau)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
-	// Convert ptau to phase1
-	phase1, power, err := ConvertPtauToPhase1(ptau)
 
 	// Write phase1 to file
-	err = WritePhase1(phase1, power, "08.ph1")
+	err = WritePhase1(phase1, uint8(ptau.Header.power), "08.ph1")
 
 	if err != nil {
 		assert.NoError(err)
@@ -129,10 +98,12 @@ func TestInitializePhase2(t *testing.T) {
 	assert := require.New(t)
 
 	ph1FilePath := "08.ph1"
-	r1csFilePath := "demo_smtb.r1cs"
+	r1csFilePath := "test.r1cs"
 	phase2FilePath := "08.ph2"
 
-	if err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath); err != nil {
+	err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath)
+
+	if err != nil {
 		assert.NoError(err)
 	}
 
