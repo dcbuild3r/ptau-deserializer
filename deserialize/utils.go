@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"io"
 	"math/big"
+
+	fp "github.com/consensys/gnark-crypto/ecc/bn254/fp"
 )
 
 func readULE32(reader io.Reader) (uint32, error) {
@@ -51,4 +53,19 @@ func reverseSlice(slice []byte) []byte {
 		slice[i], slice[j] = slice[j], slice[i]
 	}
 	return slice
+}
+
+func bytesToElement(b []byte) fp.Element {
+	var z fp.Element
+	reverseSlice(b)
+	if len(b) < 32 {
+		b = append(b, make([]byte, 32-len(b))...)
+	}
+
+	z[0] = binary.LittleEndian.Uint64(b[0:8])
+	z[1] = binary.LittleEndian.Uint64(b[8:16])
+	z[2] = binary.LittleEndian.Uint64(b[16:24])
+	z[3] = binary.LittleEndian.Uint64(b[24:32])
+
+	return z
 }
