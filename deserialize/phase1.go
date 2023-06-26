@@ -123,6 +123,7 @@ func WritePhase1(phase1 Phase1, power byte, outputPath string) error {
 	var header Header
 
 	writer := bufio.NewWriter(outputFile)
+	defer writer.Flush()
 
 	N := int(math.Pow(2, float64(power)))
 
@@ -145,7 +146,7 @@ func WritePhase1(phase1 Phase1, power byte, outputPath string) error {
 	// Write [τ⁰]₁, [τ¹]₁, [τ²]₁, …, [τ²ᴺ⁻²]₁
 	fmt.Println("1. Writing TauG1")
 	for i := 0; i < 2*N-1; i++ {
-		if err := enc.Encode(&phase1.tauG1); err != nil {
+		if err := enc.Encode(&phase1.tauG1[i]); err != nil {
 			return err
 		}
 	}
@@ -153,7 +154,7 @@ func WritePhase1(phase1 Phase1, power byte, outputPath string) error {
 	// Write α[τ⁰]₁, α[τ¹]₁, α[τ²]₁, …, α[τᴺ⁻¹]₁
 	fmt.Println("2. Writing AlphaTauG1")
 	for i := 0; i < N; i++ {
-		if err := enc.Encode(&phase1.alphaTauG1); err != nil {
+		if err := enc.Encode(&phase1.alphaTauG1[i]); err != nil {
 			return err
 		}
 	}
@@ -161,7 +162,7 @@ func WritePhase1(phase1 Phase1, power byte, outputPath string) error {
 	// Write β[τ⁰]₁, β[τ¹]₁, β[τ²]₁, …, β[τᴺ⁻¹]₁
 	fmt.Println("3. Writing BetaTauG1")
 	for i := 0; i < N; i++ {
-		if err := enc.Encode(&phase1.betaTauG1); err != nil {
+		if err := enc.Encode(&phase1.betaTauG1[i]); err != nil {
 			return err
 		}
 	}
@@ -169,7 +170,7 @@ func WritePhase1(phase1 Phase1, power byte, outputPath string) error {
 	// Write {[τ⁰]₂, [τ¹]₂, [τ²]₂, …, [τᴺ⁻¹]₂}
 	fmt.Println("4. Writing TauG2")
 	for i := 0; i < N; i++ {
-		if err := enc.Encode(&phase1.tauG2); err != nil {
+		if err := enc.Encode(&phase1.tauG2[i]); err != nil {
 			return err
 		}
 	}
