@@ -2,9 +2,23 @@
 
 .zkey and .ptau deserializer for gnark groth16 bn254 trusted setup
 
-## Testing
+## Usage
 
-Download the `.zkey` file from the [PSE Snark artifact page for semaphore](https://www.trusted-setup-pse.org/#Semaphore) by running the following command:
+Convert a `.ptau` file to a `.ph1` file:
+
+```bash
+go run main.go convert --input <CEREMONY>.ptau --output <CEREMONY>.ph1
+```
+
+Initialize phase2 of the trusted setup ceremony using the [`zkbnb-setup` coordinator](https://github.com/bnb-chain/zkbnb-setup/) (wrapper of [`gnark/backend/groth16/bn254/mpcsetup`](https://github.com/ConsenSys/gnark/tree/develop/backend/groth16/bn254/mpcsetup)):
+
+```bash
+go run main.go initialize --input <FILE>.ph1 --r1cs <CIRCUIT>.r1cs --output <FILE>.ph2
+```
+
+## Setup
+
+Download a `.zkey` file from the [PSE Snark artifact page for semaphore](https://www.trusted-setup-pse.org/#Semaphore) by running the following command:
 
 ```bash
 wget https://www.trusted-setup-pse.org/semaphore/16/semaphore.zkey -O deserialize/semaphore_16.zkey
@@ -20,7 +34,7 @@ For larger `.ptau` files, checkout the `snarkjs` repository's [README](https://g
 
 Remember that you need sufficiently high powers of tau ceremony to generate a proof for a circuit with a given amount of constraints:
 
-```tex
+```text
 2^{POWERS_OF_TAU} >= CONSTRAINTS
 ```
 
@@ -49,6 +63,8 @@ Same applies for the `.zkey` file:
 ```bash
 hexdump -C deserialize/semaphore_16.zkey > deserialize/semaphore_16.zkey.hex
 ```
+
+## Testing
 
 To test, run:
 
