@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 module example/user/ptau-deserialize
+=======
+module github.com/dcbuild3r/ptau-deserializer
+>>>>>>> 7896f41e527045d2587f9b7e0686f534371f7cd0
 
 go 1.20
 

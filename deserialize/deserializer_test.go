@@ -2,11 +2,26 @@ package deserializer
 
 import (
 	"fmt"
+	"github.com/consensys/gnark-crypto/ecc"
+	"github.com/consensys/gnark/frontend"
+	"github.com/consensys/gnark/frontend/cs/r1cs"
+	"os"
 	"testing"
 
 	"github.com/bnb-chain/zkbnb-setup/phase2"
 	"github.com/stretchr/testify/require"
 )
+
+type TestCircuit struct {
+	A, B, C frontend.Variable
+}
+
+func (circuit *TestCircuit) Define(api frontend.API) error {
+	prod := api.Mul(circuit.A, circuit.B)
+	api.AssertIsEqual(circuit.C, prod)
+	api.AssertIsEqual(circuit.A, circuit.B)
+	return nil
+}
 
 ///////////////////////////////////////////////////////////////////
 ///                             PTAU                            ///
@@ -63,6 +78,19 @@ contributions(7) - Ignore contributions, users can verify using snarkjs
     ]
 */
 
+const r1csFilePath = "test.r1cs"
+
+func TestSerializeR1CS(t *testing.T) {
+	assert := require.New(t)
+	ccs, err := frontend.Compile(ecc.BN254.ScalarField(), r1cs.NewBuilder, &TestCircuit{})
+	assert.NoError(err)
+	file, err := os.Create(r1csFilePath)
+	defer file.Close()
+	assert.NoError(err)
+	_, err = ccs.WriteTo(file)
+	assert.NoError(err)
+}
+
 func TestDeserializePtauConvertPhase1(t *testing.T) {
 	assert := require.New(t)
 
@@ -98,7 +126,6 @@ func TestInitializePhase2(t *testing.T) {
 	assert := require.New(t)
 
 	ph1FilePath := "08.ph1"
-	r1csFilePath := "test.r1cs"
 	phase2FilePath := "08.ph2"
 
 	err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath)
