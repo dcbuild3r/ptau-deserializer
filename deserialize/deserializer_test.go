@@ -1,12 +1,9 @@
 package deserializer
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"testing"
 
-	"github.com/bnb-chain/zkbnb-setup/phase1"
 	"github.com/bnb-chain/zkbnb-setup/phase2"
 	"github.com/stretchr/testify/require"
 )
@@ -66,7 +63,7 @@ contributions(7) - Ignore contributions, users can verify using snarkjs
     ]
 */
 
-func TestDeserializerPhase1(t *testing.T) {
+func TestDeserializePtauConvertPhase1(t *testing.T) {
 	assert := require.New(t)
 
 	input_path := "08.ptau"
@@ -77,93 +74,36 @@ func TestDeserializerPhase1(t *testing.T) {
 		assert.NoError(err)
 	}
 
-	phase1, err := convertPtauToSrs(ptau)
-
-	fmt.Printf("TauG1: %v \n", phase1.Parameters.G1.Tau)
-	fmt.Printf("AlphaTauG1: %v \n", phase1.Parameters.G1.AlphaTau)
-	fmt.Printf("BetaTauG1: %v \n", phase1.Parameters.G1.BetaTau)
-	fmt.Printf("TauG2: %v \n", phase1.Parameters.G2.Tau)
-	fmt.Printf("BetaG2: %v \n", phase1.Parameters.G2.Beta)
+	phase1, err := ConvertPtauToPhase1(ptau)
 
 	if err != nil {
 		assert.NoError(err)
 	}
 
-	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
-}
+	fmt.Printf("TauG1: %v \n", phase1.tauG1)
+	fmt.Printf("AlphaTauG1: %v \n", phase1.alphaTauG1)
+	fmt.Printf("BetaTauG1: %v \n", phase1.betaTauG1)
+	fmt.Printf("TauG2: %v \n", phase1.tauG2)
+	fmt.Printf("BetaG2: %v \n", phase1.betaG2)
 
-func TestDeserializerPreparePhase2Ptau(t *testing.T) {
-	assert := require.New(t)
-
-	input_path := "08.ptau"
-
-	ptau, err := ReadPtau(input_path)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
-	//mpcsetup.InitPhase2()
-
-	fmt.Printf("Size of the primes in bytes: %v \n", ptau.Header.n8)
-}
-
-func TestDeserializePh1(t *testing.T) {
-	assert := require.New(t)
-
-	input_path_ptau := "08.ptau"
-
-	ptau, err := ReadPtau(input_path_ptau)
+	// Write phase1 to file
+	err = WritePhase1(phase1, uint8(ptau.Header.power), "08.ph1")
 
 	if err != nil {
 		assert.NoError(err)
 	}
-
-	ph1, err := convertPtauToSrs(ptau)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
-	output_path := "08.ph1"
-
-	outputFile, err := os.Create(output_path)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
-	defer outputFile.Close()
-
-	writer := bufio.NewWriter(outputFile)
-	defer writer.Flush()
-
-	var header phase1.Header
-
-	header.Power = byte(uint8(8))
-
-	// Taken from https://github.com/iden3/snarkjs/#7-prepare-phase-2
-	header.Contributions = uint16(54)
-
-	ph1.WriteTo(outputFile)
-
-	phase1Path := "08.ph1"
-
-	phase1File, err := os.Open(phase1Path)
-	if err != nil {
-		assert.NoError(err)
-	}
-	defer phase1File.Close()
 }
 
 func TestInitializePhase2(t *testing.T) {
 	assert := require.New(t)
 
 	ph1FilePath := "08.ph1"
-	r1csFilePath := "simple.r1cs"
+	r1csFilePath := "test.r1cs"
 	phase2FilePath := "08.ph2"
 
-	if err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath); err != nil {
+	err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath)
+
+	if err != nil {
 		assert.NoError(err)
 	}
 
