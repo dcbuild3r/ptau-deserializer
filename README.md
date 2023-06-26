@@ -16,7 +16,13 @@ Download the `.ptau` file from the [`snarkjs` repository](https://github.com/ide
 wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_08.ptau -O deserialize/08.ptau
 ```
 
-To get `test.r1cs` file, go to [zkrepl.dev](https://zkrepl.dev/) and download the `main.r1cs` file that corresponds to the default template and save it as `test.r1cs` in the `deserialize` directory.
+For larger `.ptau` files, checkout the `snarkjs` repository's [README](https://github.com/iden3/snarkjs/tree/master#7-prepare-phase-2) for more information.
+
+Remember that you need sufficiently high powers of tau ceremony to generate a proof for a circuit with a given amount of constraints:
+
+```tex
+2^{POWERS_OF_TAU} >= CONSTRAINTS
+```
 
 To get a sample r1cs file from `semaphore-mtb`, checkout the [`semaphore-mtb` repository](https://github.com/worldcoin/semaphore-mtb.git) and run the following command:
 
