@@ -2,11 +2,12 @@ package deserializer
 
 import (
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/consensys/gnark-crypto/ecc"
 	"github.com/consensys/gnark/frontend"
 	"github.com/consensys/gnark/frontend/cs/r1cs"
-	"os"
-	"testing"
 
 	"github.com/bnb-chain/zkbnb-setup/phase2"
 	"github.com/stretchr/testify/require"
@@ -115,7 +116,7 @@ func TestDeserializePtauConvertPhase1(t *testing.T) {
 	fmt.Printf("BetaG2: %v \n", phase1.betaG2)
 
 	// Write phase1 to file
-	err = WritePhase1(phase1, uint8(ptau.Header.power), "08.ph1")
+	err = WritePhase1(phase1, uint8(ptau.Header.Power), "08.ph1")
 
 	if err != nil {
 		assert.NoError(err)

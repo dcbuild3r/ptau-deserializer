@@ -69,9 +69,9 @@ type G1 [2]big.Int
 type G2 [4]big.Int
 
 type PtauHeader struct {
-	n8    uint32
-	prime big.Int
-	power uint32
+	N8    uint32
+	Prime big.Int
+	Power uint32
 }
 
 type Ptau struct {
@@ -146,7 +146,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 
 	var PtauPubKey PtauPubKey
 
-	twoToPower := uint32(1 << header.power)
+	twoToPower := uint32(1 << header.Power)
 	PtauPubKey.TauG1, err = readG1Array(reader, twoToPower*2-1)
 
 	if err != nil {
@@ -201,7 +201,7 @@ func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 		return PtauHeader{}, err
 	}
 
-	header.n8 = n8
+	header.N8 = n8
 
 	prime, err := readBigInt(reader, n8)
 
@@ -209,7 +209,7 @@ func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 		return PtauHeader{}, err
 	}
 
-	header.prime = prime
+	header.Prime = prime
 
 	power, err := readULE32(reader)
 
@@ -217,7 +217,7 @@ func readPtauHeader(reader io.ReadSeeker) (PtauHeader, error) {
 		return PtauHeader{}, err
 	}
 
-	header.power = power
+	header.Power = power
 
 	return header, nil
 }
