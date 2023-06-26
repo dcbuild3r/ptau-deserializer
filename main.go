@@ -1,6 +1,7 @@
 package main
 
 import (
+	"deserializer"
 	"fmt"
 	"os"
 
@@ -9,17 +10,32 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:  "zkey-deserialize",
-		Usage: "Desereialize .zkey files into gnark's .ph1 format",
+		Name:  "ptau-deserialize",
+		Usage: "Deserialize .ptau files into gnark's .ph1 format",
 		Action: func(*cli.Context) error {
 			fmt.Println("Hello friend!")
 			return nil
 		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "input",
-				Aliases: []string{"c"},
-				Usage:   "Load .zkey `FILE`",
+		Commands: []*cli.Command{
+			{
+				Name:    "convert",
+				Aliases: []string{"a"},
+				Usage:   "Deserialize .ptau file into .ph1 format",
+				Action: func(cCtx *cli.Context) error {
+					fmt.Println(".ptau file path ", cCtx.Args().First())
+					ptauFilePath := cCtx.Args().First()
+
+					ptau, err := deserializer.ReadPtau(ptauFilePath)
+
+					return nil
+				},
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "ptau-file",
+						Aliases: []string{"c"},
+						Usage:   "Load .ptau `FILE`",
+					},
+				},
 			},
 		},
 	}

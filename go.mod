@@ -1,4 +1,4 @@
-module example/user/ptau-deserializer
+module example/user/ptau-deserialize
 
 go 1.20
 
