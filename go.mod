@@ -1,4 +1,4 @@
-module github.com/dcbuild3r/ptau-deserializer
+module github.com/worldcoin/ptau-deserializer
 
 go 1.20
 
