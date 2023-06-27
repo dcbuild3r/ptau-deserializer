@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/bnb-chain/zkbnb-setup/phase2"
-	deserializer "github.com/dcbuild3r/ptau-deserializer/deserialize"
+	deserializer "github.com/worldcoin/ptau-deserializer/deserialize"
 	"github.com/urfave/cli/v2"
 )
 
