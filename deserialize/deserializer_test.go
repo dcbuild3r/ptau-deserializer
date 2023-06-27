@@ -9,8 +9,8 @@ import (
 	"github.com/consensys/gnark/frontend"
 	"github.com/consensys/gnark/frontend/cs/r1cs"
 
-	"github.com/bnb-chain/zkbnb-setup/phase2"
 	"github.com/stretchr/testify/require"
+	"github.com/worldcoin/semaphore-mtb-setup/phase2"
 )
 
 type TestCircuit struct {

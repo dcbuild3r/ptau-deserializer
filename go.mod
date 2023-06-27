@@ -5,7 +5,8 @@ go 1.20
 require github.com/consensys/gnark v0.8.0 // indirect
 
 require (
-	github.com/bnb-chain/zkbnb-setup v1.0.0-ceremony
+
+	github.com/worldcoin/semaphore-mtb-setup v0.1.0
 	github.com/consensys/gnark-crypto v0.11.1-0.20230609175512-0ee617fa6d43
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7

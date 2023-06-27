@@ -141,7 +141,7 @@ func WritePhase1(phase1 Phase1, power byte, outputPath string) error {
 	// BN254 encoder using compressed representation of points to save storage space
 	enc := bn254.NewEncoder(writer)
 
-	// Taken from https://github.com/bnb-chain/zkbnb-setup/blob/main/phase1/phase1.go
+	// Taken from https://github.com/worldcoin/semaphore-mtb-setup/blob/main/phase1/phase1.go
 	// In the initialization, τ = α = β = 1, so we are writing the generators directly
 	// Write [τ⁰]₁, [τ¹]₁, [τ²]₁, …, [τ²ᴺ⁻²]₁
 	fmt.Println("1. Writing TauG1")

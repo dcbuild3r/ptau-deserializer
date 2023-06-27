@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bnb-chain/zkbnb-setup/phase2"
-	deserializer "github.com/worldcoin/ptau-deserializer/deserialize"
 	"github.com/urfave/cli/v2"
+	deserializer "github.com/worldcoin/ptau-deserializer/deserialize"
+	"github.com/worldcoin/semaphore-mtb-setup/phase2"
 )
 
 func main() {
