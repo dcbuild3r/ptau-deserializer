@@ -6,7 +6,6 @@ import (
 
 	"github.com/urfave/cli/v2"
 	deserializer "github.com/worldcoin/ptau-deserializer/deserialize"
-	"github.com/worldcoin/semaphore-mtb-setup/phase2"
 )
 
 func main() {
@@ -25,24 +24,33 @@ func main() {
 					ptauFilePath := cCtx.String("input")
 					outputFilePath := cCtx.String("output")
 
-					ptau, err := deserializer.ReadPtau(ptauFilePath)
-
+					file, err := deserializer.InitPtau(ptauFilePath)
 					if err != nil {
-						return err
+						panic(err)
+					}
+					err = deserializer.WritePhase1FromPtauFile(file, outputFilePath)
+					if err != nil {
+						panic(err)
 					}
 
-					phase1, err := deserializer.ConvertPtauToPhase1(ptau)
+					//ptau, err := deserializer.ReadPtau(ptauFilePath)
 
-					if err != nil {
-						return err
-					}
-
-					// Write phase1 to file
-					err = deserializer.WritePhase1(phase1, uint8(ptau.Header.Power), outputFilePath)
-
-					if err != nil {
-						return err
-					}
+					//if err != nil {
+					//	return err
+					//}
+					//
+					//phase1, err := deserializer.ConvertPtauToPhase1(ptau)
+					//
+					//if err != nil {
+					//	return err
+					//}
+					//
+					//// Write phase1 to file
+					//err = deserializer.WritePhase1(phase1, uint8(ptau.Header.Power), outputFilePath)
+					//
+					//if err != nil {
+					//	return err
+					//}
 
 					return nil
 				},
@@ -57,44 +65,6 @@ func main() {
 						Name:     "output",
 						Aliases:  []string{"o"},
 						Usage:    "File output for the phase 1 conversion (`FILE`.ph1)",
-						Required: true,
-					},
-				},
-			},
-			{
-				Name:    "initialize",
-				Aliases: []string{"i"},
-				Usage:   "Initialize phase 2 from phase 1 and r1cs files. Output to `OUTPUT`.ph2",
-				Action: func(cCtx *cli.Context) error {
-					phase1FilePath := cCtx.String("input")
-					r1csFilePath := cCtx.String("r1cs")
-					outputFilePath := cCtx.String("output")
-
-					err := phase2.Initialize(phase1FilePath, r1csFilePath, outputFilePath)
-
-					if err != nil {
-						return err
-					}
-
-					return nil
-				},
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:     "input",
-						Aliases:  []string{"i"},
-						Usage:    "Load `FILE`.ph1 to initialize phase 2",
-						Required: true,
-					},
-					&cli.StringFlag{
-						Name:     "r1cs",
-						Aliases:  []string{"r"},
-						Usage:    "Load `FILE`.r1cs to initialize phase 2",
-						Required: true,
-					},
-					&cli.StringFlag{
-						Name:     "output",
-						Aliases:  []string{"o"},
-						Usage:    "File output for the phase 2 initialization (`FILE`.ph2)",
 						Required: true,
 					},
 				},

@@ -72,7 +72,7 @@ type HeaderGroth struct {
 }
 
 type SectionSegment struct {
-	pos  uint32
+	pos  uint64
 	size uint64
 }
 
@@ -109,7 +109,7 @@ func ReadZkey(zkeyPath string) (Zkey, error) {
 			sections[ht] = make([]SectionSegment, 0)
 		}
 		pos, _ := reader.Seek(0, io.SeekCurrent)
-		sections[ht] = append(sections[ht], SectionSegment{pos: uint32(pos), size: hl})
+		sections[ht] = append(sections[ht], SectionSegment{pos: uint64(pos), size: hl})
 		reader.Seek(int64(hl), io.SeekCurrent)
 	}
 
