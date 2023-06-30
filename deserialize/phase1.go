@@ -30,7 +30,7 @@ func ConvertPtauToPhase1(ptau Ptau) (phase1 Phase1, err error) {
 		// fmt.Printf("Y: %v \n", g1Affine.Y.String())
 		// fmt.Printf("g1Affine: %v \n", g1Affine)
 		if !g1Affine.IsOnCurve() {
-			fmt.Errorf("tauG1: \n index: %v g1Affine.X: %v \n g1Affine.Y: %v \n", i, g1Affine.X.String(), g1Affine.Y.String())
+			fmt.Printf("tauG1: \n index: %v g1Affine.X: %v \n g1Affine.Y: %v \n", i, g1Affine.X.String(), g1Affine.Y.String())
 			panic("g1Affine is not on curve")
 		}
 		tauG1[i] = g1Affine
@@ -44,7 +44,7 @@ func ConvertPtauToPhase1(ptau Ptau) (phase1 Phase1, err error) {
 		y := bytesToElement(g1[1].Bytes())
 		g1Affine.Y = y
 		if !g1Affine.IsOnCurve() {
-			fmt.Errorf("alphaTauG1: \n index: %v g1Affine.X: %v \n g1Affine.Y: %v \n", i, g1Affine.X.String(), g1Affine.Y.String())
+			fmt.Printf("alphaTauG1: \n index: %v g1Affine.X: %v \n g1Affine.Y: %v \n", i, g1Affine.X.String(), g1Affine.Y.String())
 			panic("g1Affine is not on curve")
 		}
 		alphaTauG1[i] = g1Affine
@@ -60,7 +60,7 @@ func ConvertPtauToPhase1(ptau Ptau) (phase1 Phase1, err error) {
 		y := bytesToElement(g1[1].Bytes())
 		g1Affine.Y = y
 		if !g1Affine.IsOnCurve() {
-			fmt.Errorf("betaTauG1: \n index: %v, g1Affine.X: %v \n g1Affine.Y: %v \n", i, g1Affine.X.String(), g1Affine.Y.String())
+			fmt.Printf("betaTauG1: \n index: %v, g1Affine.X: %v \n g1Affine.Y: %v \n", i, g1Affine.X.String(), g1Affine.Y.String())
 			panic("g1Affine is not on curve")
 		}
 		betaTauG1[i] = g1Affine
