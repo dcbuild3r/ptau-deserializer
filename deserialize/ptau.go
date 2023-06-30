@@ -128,7 +128,7 @@ func InitPtau(path string) (*PtauFile, error) {
 			sections[ht] = make([]SectionSegment, 0)
 		}
 		pos, _ := reader.Seek(0, io.SeekCurrent)
-		sections[ht] = append(sections[ht], SectionSegment{pos: uint32(pos), size: hl})
+		sections[ht] = append(sections[ht], SectionSegment{pos: uint64(pos), size: hl})
 		reader.Seek(int64(hl), io.SeekCurrent)
 	}
 
@@ -288,7 +288,7 @@ func ReadPtau(zkeyPath string) (Ptau, error) {
 			sections[ht] = make([]SectionSegment, 0)
 		}
 		pos, _ := reader.Seek(0, io.SeekCurrent)
-		sections[ht] = append(sections[ht], SectionSegment{pos: uint32(pos), size: hl})
+		sections[ht] = append(sections[ht], SectionSegment{pos: uint64(pos), size: hl})
 		reader.Seek(int64(hl), io.SeekCurrent)
 	}
 
