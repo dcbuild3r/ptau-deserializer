@@ -2,6 +2,7 @@ package deserializer
 
 import (
 	"fmt"
+	"github.com/consensys/gnark-crypto/ecc/bn254"
 	"io"
 	"math/big"
 	"os"
@@ -85,6 +86,162 @@ type PtauPubKey struct {
 	AlphaTauG1 []G1
 	BetaTauG1  []G1
 	BetaG2     G2
+}
+
+type PtauFile struct {
+	Header   PtauHeader
+	Sections [][]SectionSegment
+	Reader   *os.File
+}
+
+func InitPtau(path string) (*PtauFile, error) {
+	reader, err := os.Open(path)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ptauStr = make([]byte, 4)
+	_, err = reader.Read(ptauStr)
+
+	fmt.Printf("zkeyStr: %s \n", string(ptauStr))
+
+	// version
+	_, err = readULE32(reader)
+
+	// number of sections
+	_, err = readULE32(reader)
+
+	numSections := uint32(7)
+	fmt.Printf("num sections: %v \n", numSections)
+
+	// in practice, all sections have only one segment, but who knows...
+	// 1-based indexing, so we need to allocate one more than the number of sections
+	sections := make([][]SectionSegment, numSections+1)
+	for i := uint32(0); i < numSections; i++ {
+		ht, _ := readULE32(reader)
+		hl, _ := readULE64(reader)
+		fmt.Printf("ht: %v \n", ht)
+		fmt.Printf("hl: %v \n", hl)
+		if sections[ht] == nil {
+			sections[ht] = make([]SectionSegment, 0)
+		}
+		pos, _ := reader.Seek(0, io.SeekCurrent)
+		sections[ht] = append(sections[ht], SectionSegment{pos: uint32(pos), size: hl})
+		reader.Seek(int64(hl), io.SeekCurrent)
+	}
+
+	fmt.Printf("sections: %v \n", sections)
+
+	// section size
+	_, err = readBigInt(reader, 8)
+
+	// Header (1)
+	seekToUniqueSection(reader, sections, 1)
+
+	// Read header
+	header, err := readPtauHeader(reader)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &PtauFile{Header: header, Sections: sections, Reader: reader}, nil
+}
+
+func (ptauFile *PtauFile) Close() error {
+	return ptauFile.Reader.Close()
+}
+
+func (ptauFile *PtauFile) DomainSize() int {
+	return 1 << ptauFile.Header.Power
+}
+
+func (ptauFile *PtauFile) readG1s(out chan bn254.G1Affine, count int) error {
+	for i := 0; i < count; i++ {
+		g1, err := readG1(ptauFile.Reader)
+		if err != nil {
+			return err
+		}
+		g1Affine := bn254.G1Affine{}
+		x := bytesToElement(g1[0].Bytes())
+		g1Affine.X = x
+		y := bytesToElement(g1[1].Bytes())
+		g1Affine.Y = y
+		if !g1Affine.IsOnCurve() {
+			panic("g1Affine is not on curve")
+		}
+		out <- g1Affine
+	}
+	return nil
+}
+
+func (ptauFile *PtauFile) readG2() (bn254.G2Affine, error) {
+	g2, err := readG2(ptauFile.Reader)
+	if err != nil {
+		return bn254.G2Affine{}, err
+	}
+	g2Affine := bn254.G2Affine{}
+	x0 := bytesToElement(g2[0].Bytes())
+	x1 := bytesToElement(g2[1].Bytes())
+	g2Affine.X.A0 = x0
+	g2Affine.X.A1 = x1
+	y0 := bytesToElement(g2[2].Bytes())
+	y1 := bytesToElement(g2[3].Bytes())
+	g2Affine.Y.A0 = y0
+	g2Affine.Y.A1 = y1
+	if !g2Affine.IsOnCurve() {
+		panic("g2Affine is not on curve")
+	}
+	return g2Affine, nil
+}
+
+func (ptauFile *PtauFile) readG2s(out chan bn254.G2Affine, count int) error {
+	for i := 0; i < count; i++ {
+		g2Affine, err := ptauFile.readG2()
+		if err != nil {
+			return err
+		}
+		out <- g2Affine
+	}
+	return nil
+}
+
+func (ptauFile *PtauFile) ReadTauG1(out chan bn254.G1Affine) error {
+	defer close(out)
+	seekToUniqueSection(ptauFile.Reader, ptauFile.Sections, 2)
+	numPoints := ptauFile.DomainSize()*2 - 1
+	ptauFile.readG1s(out, numPoints)
+	return nil
+}
+
+func (ptauFile *PtauFile) ReadTauG2(out chan bn254.G2Affine) error {
+	defer close(out)
+	seekToUniqueSection(ptauFile.Reader, ptauFile.Sections, 3)
+	numPoints := ptauFile.DomainSize()
+	ptauFile.readG2s(out, numPoints)
+	return nil
+}
+
+func (ptauFile *PtauFile) ReadAlphaTauG1(out chan bn254.G1Affine) error {
+	defer close(out)
+	seekToUniqueSection(ptauFile.Reader, ptauFile.Sections, 4)
+	numPoints := ptauFile.DomainSize()
+	ptauFile.readG1s(out, numPoints)
+	return nil
+}
+
+func (ptauFile *PtauFile) ReadBetaTauG1(out chan bn254.G1Affine) error {
+	defer close(out)
+	seekToUniqueSection(ptauFile.Reader, ptauFile.Sections, 5)
+	numPoints := ptauFile.DomainSize()
+	ptauFile.readG1s(out, numPoints)
+	return nil
+}
+
+func (ptauFile *PtauFile) ReadBetaG2() (bn254.G2Affine, error) {
+	seekToUniqueSection(ptauFile.Reader, ptauFile.Sections, 6)
+	return ptauFile.readG2()
 }
 
 func ReadPtau(zkeyPath string) (Ptau, error) {

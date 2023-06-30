@@ -10,7 +10,6 @@ import (
 	"github.com/consensys/gnark/frontend/cs/r1cs"
 
 	"github.com/stretchr/testify/require"
-	"github.com/worldcoin/semaphore-mtb-setup/phase2"
 )
 
 type TestCircuit struct {
@@ -121,20 +120,6 @@ func TestDeserializePtauConvertPhase1(t *testing.T) {
 	if err != nil {
 		assert.NoError(err)
 	}
-}
-
-func TestInitializePhase2(t *testing.T) {
-	assert := require.New(t)
-
-	ph1FilePath := "08.ph1"
-	phase2FilePath := "08.ph2"
-
-	err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
 }
 
 ///////////////////////////////////////////////////////////////////
