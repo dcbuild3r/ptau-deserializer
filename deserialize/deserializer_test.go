@@ -9,7 +9,6 @@ import (
 	"github.com/consensys/gnark/frontend"
 	"github.com/consensys/gnark/frontend/cs/r1cs"
 
-	"github.com/bnb-chain/zkbnb-setup/phase2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -121,20 +120,6 @@ func TestDeserializePtauConvertPhase1(t *testing.T) {
 	if err != nil {
 		assert.NoError(err)
 	}
-}
-
-func TestInitializePhase2(t *testing.T) {
-	assert := require.New(t)
-
-	ph1FilePath := "08.ph1"
-	phase2FilePath := "08.ph2"
-
-	err := phase2.Initialize(ph1FilePath, r1csFilePath, phase2FilePath)
-
-	if err != nil {
-		assert.NoError(err)
-	}
-
 }
 
 ///////////////////////////////////////////////////////////////////

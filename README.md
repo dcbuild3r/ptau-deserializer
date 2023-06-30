@@ -10,7 +10,7 @@ Convert a `.ptau` file to a `.ph1` file:
 go run main.go convert --input <CEREMONY>.ptau --output <CEREMONY>.ph1
 ```
 
-Initialize phase2 of the trusted setup ceremony using the [`zkbnb-setup` coordinator](https://github.com/bnb-chain/zkbnb-setup/) (wrapper of [`gnark/backend/groth16/bn254/mpcsetup`](https://github.com/ConsenSys/gnark/tree/develop/backend/groth16/bn254/mpcsetup)):
+Initialize phase2 of the trusted setup ceremony using the [`semaphore-mtb-setup` coordinator](https://github.com/worldcoin/semaphore-mtb-setup/) (wrapper of [`gnark/backend/groth16/bn254/mpcsetup`](https://github.com/ConsenSys/gnark/tree/develop/backend/groth16/bn254/mpcsetup)):
 
 ```bash
 go run main.go initialize --input <FILE>.ph1 --r1cs <CIRCUIT>.r1cs --output <FILE>.ph2
