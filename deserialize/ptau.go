@@ -194,7 +194,7 @@ func (ptauFile *PtauFile) readG2() (bn254.G2Affine, error) {
 	g2Affine.Y.A1 = y1
 	if !g2Affine.IsOnCurve() {
 
-		fmt.Printf("readG2s: \n index: %v, g2Affine.X.A0: %v \n g2Affine.X.A1: %v \n g2Affine.Y.A0: %v \n g2Affine.Y.A1 %v \n", i, g2Affine.X.A0.String(), g2Affine.X.A1.String(), g2Affine.Y.A0.String(), g2Affine.Y.A1.String())
+		fmt.Printf("readG2s: \n, g2Affine.X.A0: %v \n g2Affine.X.A1: %v \n g2Affine.Y.A0: %v \n g2Affine.Y.A1 %v \n", g2Affine.X.A0.String(), g2Affine.X.A1.String(), g2Affine.Y.A0.String(), g2Affine.Y.A1.String())
 		panic("g2Affine is not on curve")
 	}
 	return g2Affine, nil
